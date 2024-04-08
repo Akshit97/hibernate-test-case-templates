@@ -1,17 +1,18 @@
 package org.hibernate.bugs;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Random;
-import java.util.Set;
 
 @Entity
 @Access(AccessType.PROPERTY)
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Event implements Serializable {
@@ -28,14 +29,6 @@ public class Event implements Serializable {
     @Column(name = "EVENT_SEQ")
     public Long getId() {
         return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setCompany(Company company) {
-        this.company = company;
     }
 
     @JoinColumn(name = "COMPANY_FK")
@@ -59,7 +52,7 @@ public class Event implements Serializable {
         this.oldEventSeq = oldEventSeq;
     }
 
-    @ManyToOne(optional = true, fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "OLD_EVENT_FK", referencedColumnName = "EVENT_SEQ", insertable=false, updatable = false),
             @JoinColumn(name = "COMPANY_FK", referencedColumnName = "COMPANY_FK", insertable=false, updatable = false)

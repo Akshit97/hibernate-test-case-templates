@@ -19,8 +19,12 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.query.Query;
 import org.hibernate.testing.junit4.BaseCoreFunctionalTestCase;
+import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.List;
 
 /**
  * This template demonstrates how to develop a test case for Hibernate ORM, using its built-in unit test framework.
@@ -37,6 +41,8 @@ public class ORMUnitTestCase extends BaseCoreFunctionalTestCase {
 	@Override
 	protected Class[] getAnnotatedClasses() {
 		return new Class[] {
+				Event.class,
+				Company.class
 //				Foo.class,
 //				Bar.class
 		};
@@ -72,7 +78,30 @@ public class ORMUnitTestCase extends BaseCoreFunctionalTestCase {
 		// BaseCoreFunctionalTestCase automatically creates the SessionFactory and provides the Session.
 		Session s = openSession();
 		Transaction tx = s.beginTransaction();
-		// Do stuff...
+		Company company = new Company();
+		company.setId(1L);
+		s.save(company);
+
+		Event event = new Event();
+		event.setId(1L);
+		event.setEventType("old event type");
+		event.setCompany(company);
+		event.setOldEvent(null);
+		s.save(event);
+		tx.commit();
+		s.close();
+
+		s = openSession();
+		tx = s.beginTransaction();
+		Query query = s.createQuery("select e from Event e where e.id = 1");
+		List<Event> eventList = query.list();
+		Assert.assertEquals(1, eventList.size());
+
+		query = s.createQuery("select e from Event e where e.id = 1 and e.oldEventSeq = null");
+		eventList = query.list();
+		query = s.createQuery("select e from Event e where e.id = 1 and e.oldEvent = null ");
+		eventList = query.list();
+		Assert.assertEquals(1, eventList.size());
 		tx.commit();
 		s.close();
 	}

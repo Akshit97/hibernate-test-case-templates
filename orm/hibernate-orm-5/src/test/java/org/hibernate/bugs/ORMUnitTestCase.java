@@ -25,7 +25,10 @@ import org.hibernate.testing.junit4.BaseCoreFunctionalTestCase;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This template demonstrates how to develop a test case for Hibernate ORM, using its built-in unit test framework.
@@ -42,9 +45,10 @@ public class ORMUnitTestCase extends BaseCoreFunctionalTestCase {
 	@Override
 	protected Class[] getAnnotatedClasses() {
 		return new Class[] {
-				Company.class,
-				Event.class,
-				EventDetail.class
+				//Company.class,
+				//Event.class,
+				EntityA.class,
+				EntityB.class
 //				Foo.class,
 //				Bar.class
 		};
@@ -84,20 +88,39 @@ public class ORMUnitTestCase extends BaseCoreFunctionalTestCase {
 		company.setId(1L);
 		s.save(company);
 
-		EventDetail eventDetail = new EventDetail();
-		eventDetail.setId(1L);
-		eventDetail.setCompany(company);
-		s.save(eventDetail);
+		Event event = new Event();
+		event.setId(1L);
+		event.setEventType("old event type");
+		event.setCompany(company);
+		event.setOldEvent(null);
+		s.save(event);
 		tx.commit();
 		s.close();
 
 		s = openSession();
 		tx = s.beginTransaction();
-		Query query = s.createQuery("select ced from EventDetail ced where ced.id = 1 ");
-		List<EventDetail> eventDetailList = query.list();
-		EventDetail eventDetail1 = eventDetailList.get(0);
-		Assert.assertNull(eventDetail1.getEvent());
+		Query query = s.createQuery("select e from Event e where e.id = :id");
+		query.setParameter("id", 1L);
+		List<Event> eventList = query.list();
+		Assert.assertEquals(1, eventList.size());
+
+		query = s.createQuery("select e from Event e where e.id = 1 and e.oldEventSeq = null");
+		eventList = query.list();
+
+		query = s.createQuery("select e from Event e where e.id = 1 and e.oldEvent = null ");
+		eventList = query.list();
+		Assert.assertEquals(1, eventList.size());
 		tx.commit();
 		s.close();
+	}
+
+	@Test
+	public void manyToManyTest() throws Exception {
+		List<Class> classes = Arrays.asList(EntityA.class);
+		List<String> simpleClassNames = classes.stream().map(c -> c.getSimpleName()).collect(Collectors.toList());
+
+		System.out.println(simpleClassNames);
+		String name = EntityA.class.getName();
+		System.out.println(name);
 	}
 }
