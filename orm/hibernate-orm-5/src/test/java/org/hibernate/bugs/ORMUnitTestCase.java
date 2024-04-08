@@ -80,47 +80,7 @@ public class ORMUnitTestCase extends BaseCoreFunctionalTestCase {
 
 	// Add your tests, using standard JUnit.
 	@Test
-	public void hhh123Test() throws Exception {
-		// BaseCoreFunctionalTestCase automatically creates the SessionFactory and provides the Session.
-		Session s = openSession();
-		Transaction tx = s.beginTransaction();
-		Company company = new Company();
-		company.setId(1L);
-		s.save(company);
-
-		Event event = new Event();
-		event.setId(1L);
-		event.setEventType("old event type");
-		event.setCompany(company);
-		event.setOldEvent(null);
-		s.save(event);
-		tx.commit();
-		s.close();
-
-		s = openSession();
-		tx = s.beginTransaction();
-		Query query = s.createQuery("select e from Event e where e.id = :id");
-		query.setParameter("id", 1L);
-		List<Event> eventList = query.list();
-		Assert.assertEquals(1, eventList.size());
-
-		query = s.createQuery("select e from Event e where e.id = 1 and e.oldEventSeq = null");
-		eventList = query.list();
-
-		query = s.createQuery("select e from Event e where e.id = 1 and e.oldEvent = null ");
-		eventList = query.list();
-		Assert.assertEquals(1, eventList.size());
-		tx.commit();
-		s.close();
-	}
-
-	@Test
 	public void manyToManyTest() throws Exception {
-		List<Class> classes = Arrays.asList(EntityA.class);
-		List<String> simpleClassNames = classes.stream().map(c -> c.getSimpleName()).collect(Collectors.toList());
 
-		System.out.println(simpleClassNames);
-		String name = EntityA.class.getName();
-		System.out.println(name);
 	}
 }

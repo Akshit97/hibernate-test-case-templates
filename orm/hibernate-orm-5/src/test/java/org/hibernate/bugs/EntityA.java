@@ -21,7 +21,7 @@ public class EntityA implements Serializable {
     private List<EntityB> entityBList;
 
     @Id
-    @Column(name = "A_SEQ")
+    @Column(name = "A_SEQ", unique = true)
     public Long getId1() {
         return id1;
     }
@@ -33,12 +33,12 @@ public class EntityA implements Serializable {
     }
 
     @ManyToMany
-    @JoinTable(name = "A_B_Table", joinColumns =
-            {@JoinColumn(name = "A_SEQ", referencedColumnName = "A_SEQ"),
-                    @JoinColumn(name = "A_SEQ_1", referencedColumnName = "A_SEQ_1")},
-            inverseJoinColumns = @JoinColumn(name = "B_SEQ"))
-//    @JoinTable(name = "A_B_Table", joinColumns = @JoinColumn(name = "A_SEQ", referencedColumnName = "A_SEQ"),
-//    inverseJoinColumns = @JoinColumn(name = "B_SEQ"))
+//    @JoinTable(name = "A_B_Table", joinColumns =
+//            {@JoinColumn(name = "A_SEQ", referencedColumnName = "A_SEQ"),
+//                    @JoinColumn(name = "A_SEQ_1", referencedColumnName = "A_SEQ_1")},
+//            inverseJoinColumns = @JoinColumn(name = "B_SEQ"))
+    @JoinTable(name = "A_B_Table", joinColumns = @JoinColumn(name = "A_SEQ", referencedColumnName = "A_SEQ"),
+    inverseJoinColumns = @JoinColumn(name = "B_SEQ", referencedColumnName = "B_SEQ"))
     public List<EntityB> getEntityBList() {
         return entityBList;
     }
