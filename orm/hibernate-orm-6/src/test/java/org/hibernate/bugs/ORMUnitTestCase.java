@@ -41,8 +41,8 @@ public class ORMUnitTestCase extends BaseCoreFunctionalTestCase {
 	@Override
 	protected Class[] getAnnotatedClasses() {
 		return new Class[] {
-				Event.class,
-				Company.class
+				EntityA.class,
+				EntityB.class
 //				Foo.class,
 //				Bar.class
 		};
@@ -74,35 +74,7 @@ public class ORMUnitTestCase extends BaseCoreFunctionalTestCase {
 
 	// Add your tests, using standard JUnit.
 	@Test
-	public void hhh123Test() throws Exception {
-		// BaseCoreFunctionalTestCase automatically creates the SessionFactory and provides the Session.
-		Session s = openSession();
-		Transaction tx = s.beginTransaction();
-		Company company = new Company();
-		company.setId(1L);
-		s.save(company);
+	public void manyToManyTest() throws Exception {
 
-		Event event = new Event();
-		event.setId(1L);
-		event.setEventType("old event type");
-		event.setCompany(company);
-		event.setOldEvent(null);
-		s.save(event);
-		tx.commit();
-		s.close();
-
-		s = openSession();
-		tx = s.beginTransaction();
-		Query query = s.createQuery("select e from Event e where e.id = 1");
-		List<Event> eventList = query.list();
-		Assert.assertEquals(1, eventList.size());
-
-		query = s.createQuery("select e from Event e where e.id = 1 and e.oldEventSeq = null");
-		eventList = query.list();
-		query = s.createQuery("select e from Event e where e.id = 1 and e.oldEvent = null ");
-		eventList = query.list();
-		Assert.assertEquals(1, eventList.size());
-		tx.commit();
-		s.close();
 	}
 }
