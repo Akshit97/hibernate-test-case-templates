@@ -16,13 +16,23 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class EventDetail implements Serializable {
 
-    private Long id;
+    private Long eventDetailId;
     private Company company;
     private Event event;
+    private EmbeddableEntity embeddableEntity;
+
+    @Embedded
+    public EmbeddableEntity getEmbeddableEntity() {
+        return embeddableEntity;
+    }
+
+    public void setEmeddableEntity(EmbeddableEntity embeddableEntity) {
+        this.embeddableEntity = embeddableEntity;
+    }
     @Id
     @Column(name = "EVENT_DETAIL_SEQ")
-    public Long getId() {
-        return id;
+    public Long getEventDetailId() {
+        return eventDetailId;
     }
 
 
@@ -46,7 +56,7 @@ public class EventDetail implements Serializable {
 
     public void setEvent(Event event) {
         this.event = event;
-        this.eventSeq = event == null ? null : event.getId();
+        this.eventSeq = event == null ? null : event.getEventId();
     }
 
     @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)

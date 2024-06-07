@@ -19,8 +19,14 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.query.Query;
 import org.hibernate.testing.junit4.BaseCoreFunctionalTestCase;
+import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * This template demonstrates how to develop a test case for Hibernate ORM, using its built-in unit test framework.
@@ -39,6 +45,11 @@ public class ORMUnitTestCase extends BaseCoreFunctionalTestCase {
 		return new Class[] {
 //				Foo.class,
 //				Bar.class
+				Company.class,
+				Event.class,
+				EventDetail.class,
+				EventSingleId.class,
+				EventDetailSingleId.class
 		};
 	}
 
@@ -67,13 +78,95 @@ public class ORMUnitTestCase extends BaseCoreFunctionalTestCase {
 	}
 
 	// Add your tests, using standard JUnit.
+
 	@Test
-	public void hhh123Test() throws Exception {
-		// BaseCoreFunctionalTestCase automatically creates the SessionFactory and provides the Session.
+	public void testJoin() throws Exception {
+		Company company1 = persistData1();
+		Company company2 = persistData2();
+
+		//Actual Test
 		Session s = openSession();
 		Transaction tx = s.beginTransaction();
-		// Do stuff...
+
+		//Composite Id Query
+		Query query = s.createQuery("select ed from EventDetail ed where ed.event.company  = :company");
+		query.setParameter("company", company2);
+		List<EventDetail> eventDetailListResult = query.list();
+		System.out.println(eventDetailListResult.size());
+		Assert.assertEquals(1, eventDetailListResult.size());
+
+		//Single Id Query
+		query = s.createQuery("select ed from EventDetailSingleId ed where ed.event.company  = :company");
+		query.setParameter("company", company1);
+		List<EventDetail> eventDetailSingleIdListResult = query.list();
+		System.out.println(eventDetailSingleIdListResult.size());
+		Assert.assertEquals(1, eventDetailSingleIdListResult.size());
+
 		tx.commit();
 		s.close();
+
+
+	}
+
+	private Company persistData1() {
+		//Persist Data Single Id
+		Session s = openSession();
+		Transaction tx = s.beginTransaction();
+		Company company = new Company();
+		company.setId(1L);
+		s.save(company);
+
+		EventSingleId event = new EventSingleId();
+		event.setId(1L);
+		event.setCompany(company);
+		event.setEventType("old event type");
+		s.save(event);
+
+		EventDetailSingleId eventDetail = new EventDetailSingleId();
+		eventDetail.setId(1L);
+		eventDetail.setCompany(company);
+		//eventDetail.setEvent(event);
+
+		Set<EventDetailSingleId> eventDetailSet = new HashSet<>();
+		eventDetailSet.add(eventDetail);
+		event.setEventDetailSet(eventDetailSet);
+
+		s.save(eventDetail);
+		s.save(event);
+
+		tx.commit();
+		s.close();
+		return company;
+	}
+
+	private Company persistData2() {
+		//Persist Data Composite Id
+		Session s = openSession();
+		Transaction tx = s.beginTransaction();
+		Company company = new Company();
+		company.setId(2L);
+		s.save(company);
+
+		Event event = new Event();
+		event.setId(1L);
+		event.setCompany(company);
+		event.setEventType("old event type");
+		s.save(event);
+
+		EventDetail eventDetail = new EventDetail();
+		eventDetail.setId(1L);
+		eventDetail.setCompany(company);
+		//eventDetail.setEvent(event);
+
+		Set<EventDetail> eventDetailSet = new HashSet<>();
+		eventDetailSet.add(eventDetail);
+		event.setEventDetailSet(eventDetailSet);
+
+		s.save(eventDetail);
+		s.save(event);
+
+		tx.commit();
+		s.close();
+		return company;
 	}
 }

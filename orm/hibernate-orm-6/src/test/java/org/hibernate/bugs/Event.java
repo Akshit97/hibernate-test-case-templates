@@ -1,11 +1,11 @@
 package org.hibernate.bugs;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Random;
 import java.util.Set;
@@ -18,18 +18,18 @@ import java.util.Set;
 @AllArgsConstructor
 public class Event implements Serializable {
 
-    private Long eventId = new Random().nextLong();
+    private Long id = new Random().nextLong();
     private Company company;
     private Set<EventDetail> eventDetailSet;
     private String eventType;
     @Id
     @Column(name = "EVENT_SEQ")
-    public Long getEventId() {
-        return eventId;
+    public Long getId() {
+        return id;
     }
 
     @JoinColumn(name = "COMPANY_FK")
-    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY, optional = false)
     @Id
     public Company getCompany() {
         return company;

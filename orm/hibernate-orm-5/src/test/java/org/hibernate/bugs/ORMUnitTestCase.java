@@ -44,7 +44,8 @@ public class ORMUnitTestCase extends BaseCoreFunctionalTestCase {
 		return new Class[] {
 				Company.class,
 				Event.class,
-				EventDetail.class
+				EventDetail.class,
+				EmbeddableEntity.class
 //				Foo.class,
 //				Bar.class
 		};
@@ -84,8 +85,12 @@ public class ORMUnitTestCase extends BaseCoreFunctionalTestCase {
 		company.setId(1L);
 		s.save(company);
 
+		EmbeddableEntity embeddableEntity = new EmbeddableEntity();
+		embeddableEntity.setName("testName");
+
 		EventDetail eventDetail = new EventDetail();
-		eventDetail.setId(1L);
+		eventDetail.setEventDetailId(1L);
+		eventDetail.setEmeddableEntity(embeddableEntity);
 		eventDetail.setCompany(company);
 		s.save(eventDetail);
 		tx.commit();
@@ -93,7 +98,44 @@ public class ORMUnitTestCase extends BaseCoreFunctionalTestCase {
 
 		s = openSession();
 		tx = s.beginTransaction();
-		Query query = s.createQuery("select ced from EventDetail ced where ced.id = 1 ");
+		Query query = s.createQuery("select ced from EventDetail ced where ced.eventDetailId = 1 ");
+		List<EventDetail> eventDetailList = query.list();
+		EventDetail eventDetail1 = eventDetailList.get(0);
+		Assert.assertNull(eventDetail1.getEvent());
+		tx.commit();
+		s.close();
+	}
+
+	@Test
+	public void hhh123Test1() throws Exception {
+		// BaseCoreFunctionalTestCase automatically creates the SessionFactory and provides the Session.
+		Session s = openSession();
+		Transaction tx = s.beginTransaction();
+		Company company = new Company();
+		company.setId(1L);
+		s.save(company);
+
+		Event event = new Event();
+		event.setEventId(1L);
+		event.setCompany(company);
+		event.setEventType("test");
+		s.save(event);
+
+		EmbeddableEntity embeddableEntity = new EmbeddableEntity();
+		embeddableEntity.setName("testName");
+
+		EventDetail eventDetail = new EventDetail();
+		eventDetail.setEventDetailId(1L);
+		eventDetail.setEmeddableEntity(embeddableEntity);
+		eventDetail.setCompany(company);
+		eventDetail.setEvent(event);
+		s.save(eventDetail);
+		tx.commit();
+		s.close();
+
+		s = openSession();
+		tx = s.beginTransaction();
+		Query query = s.createQuery("select ced from EventDetail ced where ced.eventDetailId = 1 ");
 		List<EventDetail> eventDetailList = query.list();
 		EventDetail eventDetail1 = eventDetailList.get(0);
 		Assert.assertNull(eventDetail1.getEvent());
